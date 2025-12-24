@@ -17,5 +17,5 @@ ENV GOOS=linux
 #ENV GOARCH=amd64
 
 # Airをインストール
-RUN go install github.com/air-verse/air@latest
+RUN go install github.com/air-verse/air@v1.62.0
 CMD ["air", "-c", ".air.toml"]

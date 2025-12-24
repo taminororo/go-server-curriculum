@@ -3,33 +3,45 @@ package main
 import (
 	"log"
 
+	"go-server-curriculum/handler"
+	"go-server-curriculum/infrastructure"
+	"go-server-curriculum/repository"
+	"go-server-curriculum/usecase"
+
 	"github.com/labstack/echo/v4"
 )
 
 func main() {
 	// DB 初期化
-	// db, err := infrastructure.NewMySQLDB()
-	// if err != nil {
-	// 	log.Fatalf("failed to connect to database: %v", err)
-	// }
+	db, err := infrastructure.NewMySQLDB()
+	if err != nil {
+		log.Fatalf("failed to connect to database: %v", err)
+	}
 
-	// // リポジトリ初期化
-	// productRepo := repository.NewProductRepository(db)
-	// orderRepo := repository.NewOrderRepository(db)
+	// リポジトリ初期化
+	productRepo := repository.NewProductRepository(db)
+	orderRepo := repository.NewOrderRepository(db)
 
-	// // ユースケース初期化
-	// productUsecase := usecase.NewProductUsecase(productRepo)
-	// orderUsecase := usecase.NewOrderUsecase(orderRepo)
+	// ユースケース初期化
+	productUsecase := usecase.NewProductUsecase(productRepo)
+	orderUsecase := usecase.NewOrderUsecase(orderRepo)
 
-	// // ハンドラー初期化
-	// productHandler := handler.NewProductHandler(productUsecase)
-	// orderHandler := handler.NewOrderHandler(orderUsecase)
+	// ハンドラー初期化
+	productHandler := handler.NewProductHandler(productUsecase)
+	orderHandler := handler.NewOrderHandler(orderUsecase)
 
 	// Echoルーター設定
 	e := echo.New()
-	// e.GET("/products", productHandler.GetProducts)
-	// e.GET("/products/:id", productHandler.GetProduct)
-	// e.GET("/orders", orderHandler.GetOrders)
+	
+	// Product routes
+	e.GET("/products", productHandler.GetProducts)
+	e.GET("/products/:id", productHandler.GetProduct)
+	e.POST("/products", productHandler.CreateProduct)
+	e.PUT("/products/:id", productHandler.UpdateProduct)
+	e.DELETE("/products/:id", productHandler.DeleteProduct)
+	
+	// Order routes
+	e.GET("/orders", orderHandler.GetOrders)
 
 	// サーバー起動
 	log.Println("Server running on port 8080")
